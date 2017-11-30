@@ -1,0 +1,1449 @@
+Main
+ユーザー名：Z05781
+PW：x8dZyCcs
+--PW：8dZyCcsx
+
+smtdbuser	dPw$z4Ra
+
+redmine password
+Z05781_passw0rd
+
+--2017/10/25 仕入　移行
+sqlldr userid=ZZ/ZZ control=ZZSI02B5.ctl direct=y log=ZZSI02B5.log skip=1
+sqlldr userid=ZZ/ZZ control=ZZSI01B5.ctl direct=y log=ZZSI01B5.log skip=1
+
+--在庫
+sqlldr userid=ZZ/ZZ control=ZZZK01B5.ctl direct=y log=ZZZK01B5.log skip=1
+
+sqlldr userid=ZZ/ZZ control=ZZMS07B5.ctl direct=y log=ZZMS07B5.log skip=1
+
+--発注明細
+sqlldr userid=ZZ/ZZ control=ZZHC05B5.ctl direct=y log=ZZHC05B5.log skip=1
+--発注ヘッダー
+sqlldr userid=ZZ/ZZ control=ZZHC01B5.ctl direct=y log=ZZHC01B5.log skip=1
+
+DROP SEQUENCE SMT51.SQ_SIRE_BNG;
+/
+CREATE SEQUENCE SMT51.SQ_SIRE_BNG
+INCREMENT BY 1
+START WITH 1
+MAXVALUE 999999
+NOMINVALUE
+CYCLE 
+NOCACHE
+ORDER 
+/
+
+DROP SEQUENCE SMT51.SQ_IDOHKN_TNK_SOBET_ID
+/
+CREATE SEQUENCE SMT51.SQ_IDOHKN_TNK_SOBET_ID
+INCREMENT BY 1
+START WITH 1
+MAXVALUE 99999999
+NOMINVALUE
+CYCLE 
+NOCACHE
+ORDER 
+/
+TRUNCATE TABLE SMT51.T_KOBETU_KANRI_BNG_SIBN
+/
+
+
+\\Tera04\NSSOL\A70_移行\90_資料\20170922_移行ツールの概要説明
+
+
+
+NSSOLサポート
+①EBS製品保守用アカウント（標準）：00093R13JN
+②技術支援専用アカウント　　　　ID:00089R12JN
+
+①②パスワード:1qaz2wsx
+
+NPレビューまで完了しました。
+設計者レビューお願いします。
+
+proxy.np-nippan.co.jp
+80
+
+日本語表示 ruby 2.1以降??
+ruby -EWindows-31J:Windows-31J 
+
+python -u 
+
+dev2版 http://inippan02.np-nippan.co.jp:8020/oa_servlets/AppsLogin
+dev3版 http://inippan02.np-nippan.co.jp:8030/oa_servlets/AppsLogin
+
+SMART開発
+① http://smt-d-ap01.np-nippan.co.jp/smart-web/CM0010G1/init
+② http://smt-d-ap01.np-nippan.co.jp/smart-web2/CM0010G1/init
+③ http://smt-d-ap01.np-nippan.co.jp/smart-web3/CM0010G1/init
+④ http://smt-d-ap01.np-nippan.co.jp/smart-web4/CM0010G1/init
+
+svn
+http://smt-d-ap01.np-nippan.co.jp/svn/repos/smart
+http://smt-d-ap01.np-nippan.co.jp/svn/repos/smart/source/trunk/
+
+/usr/local/SMART/bin
+/nippan/if5/ebs_to_smt
+
+/np/smt/db/logs
+
+
+..作業:151030:151030
+
+...SQLPLUS前:161004:161004
+column log_date new_value log_date_text noprint
+select to_char(sysdate,'yyyymmddhh24mi') log_date from dual;
+spool c:\sqllog\&log_date_text._log.txt
+
+set def off
+set line 1000
+set time on
+
+set timing on
+set echo on
+
+...SMARTテスト:170515:170531
+2017/5/15
+
+su - smtdbuser
+dPw$z4Ra
+
+cd /np/smt/db/
+
+-- 請求明細書 OK
+/np/smt/db/bin/create_pdf.sh UA0170C1.sql  1 20160419 "" "" ""
+/np/smt/db/bin/create_pdf.sh UA0170C1.sql  1 20160420 "" "" ""
+
+/np/smt/db/bin/create_pdf.sh UA0170C1.sql  2 "" 201604  "" ""
+/np/smt/db/bin/create_pdf.sh UA0170C1.sql  3 "" 201604  "" ""
+
+
+/np/smt/db/bin/create_pdf.sh UA0170C1.sql  3 20160131 201601 "" ""
+/np/smt/db/bin/create_pdf.sh UA0170C1.sql  1 20160131 201601 "" ""
+/np/smt/db/bin/create_pdf.sh UA0170C1.sql  1 20160405 201603 "" ""
+
+
+-- 総括請求書 OK
+/np/smt/db/bin/create_pdf.sh UA0160C1.sql  1 20160420 "" "" ""
+/np/smt/db/bin/create_pdf.sh UA0160C1.sql  1 20160220 "" "" ""
+/np/smt/db/bin/create_pdf.sh UA0160C1.sql  2 "" 201604  "" ""
+/np/smt/db/bin/create_pdf.sh UA0160C1.sql  3 "" 201604  "" ""
+/np/smt/db/bin/create_pdf.sh UA0160C1.sql  3 "" 201602  "" ""
+
+
+--対象日テスト
+UPDATE SMT12.M_SYSTEM_D
+SET SYSTEM_YMD = TO_DATE(:SDATE, 'YYYYMMDD')
+;
+/np/smt2/db/bin/create_pdf.sh UA0160C1.sql  1 "" "" "" ""
+
+
+/np/smt2/db/bin/create_pdf.sh UA0170C1.sql  1 "" "" "" ""
+
+
+/np/smt/db/bin/create_pdf.sh UA0160C1.sql  1 20160430 "" "" ""
+
+
+-- 出荷・庫出データ取込処理（日新製鋼建材）
+/np/smt/db/bin/exec_plsql.sh KG3010B1.sql 1 05R3001 180637
+/np/smt/db/bin/exec_plsql.sh UA0050B1.sql 5 1 "" 180637
+
+/np/smt/db/bin/exec_plsql.sh KG3010B1.sql 2 05R3001 155870
+/np/smt/db/bin/exec_plsql.sh UA0050B1.sql 5 1 "" 155870
+/np/smt/db/bin/exec_plsql.sh ZK0100B1.sql 155870
+
+
+
+
+
+/np/smt/db/bin/create_pdf.sh UA0170C1.sql 1 "" "" "" ""
+/np/smt/db/bin/create_pdf.sh UA0170C1.sql 2 "" "" "" ""
+/np/smt/db/bin/create_pdf.sh UA0170C1.sql 3 "" "" "" ""
+
+/np/smt/db/bin/create_pdf.sh UA0170C1.sql  3 20160430 201604 '' ''
+/np/smt/db/bin/create_pdf.sh UA0170C1.sql  3 20160331 201603 "" ""
+/np/smt/db/bin/create_pdf.sh UA0170C1.sql  3 20160131 201601 "" ""
+/np/smt/db/bin/create_pdf.sh UA0170C1.sql  1 20160331 201603 "" ""
+/np/smt/db/bin/create_pdf.sh UA0170C1.sql  1 20160430 201604 "" ""
+ 01 03601-08
+
+
+
+sh /np/smt/db/bin/create_pdf.sh RE1050C1.sql 20160404 155870
+sh 
+
+sh create_pdf.sh UA0170C1.sql 3
+
+UA0170C1.sql
+
+1：鑑（得意先締日）
+2：表紙（２旬締日）
+3：表紙（３旬締日）
+
+YYYYMMDD	鑑処理対象締年月日
+YYYYMM	表紙処理対象年月
+i_parameter_array(4)	母店コード
+i_parameter_array(5)	得意先サイトコード
+
+UA0160C
+create_pdf.sh	UA0160C1.sql	
+	"1：鑑（得意先締日）
+	2：表紙（２旬締日）
+	3：表紙（３旬締日）"	処理対象区分
+	YYYYMMDD	鑑処理対象締年月日
+	YYYYMMDD	表紙処理対象年月
+	i_parameter_array(4)	母店コード
+	i_parameter_array(5)	得意先サイトコード
+
+...PATCH_WK SQLLOADER:170112:170202
+sqlldr userid=ZZ/ZZ@SMT_D01 control=ZZ_NP_IKO_PATCH_WK.ctl
+
+sqlldr userid=ZZ/ZZ@SMT_P01 control=ZZ_NP_IKO_PATCH_WK.ctl
+
+...SMART開発環境:161025:170613
+環境名	APサーバ		DBサーバ		
+		ディレクトリ	ログイン画面URL	ディレクトリ	Oracleインスタンス	Oracleメインユーザ
+開発環境①	/np/smt/ap	http://smt-d-ap01.np-nippan.co.jp/smart-web/CM0010G1/init	/np/smt/db	smt_d01	SMT11
+開発環境②	/np/smt2/ap	http://smt-d-ap01.np-nippan.co.jp/smart-web2/CM0010G1/init	/np/smt2/db		SMT12
+開発環境③	/np/smt3/ap	http://smt-d-ap01.np-nippan.co.jp/smart-web3/CM0010G1/init	/np/smt3/db		SMT13
+開発環境④	/np/smt4/ap	http://smt-d-ap01.np-nippan.co.jp/smart-web4/CM0010G1/init	/np/smt4/db		SMT14
+
+
+SMT01/dPs5UbvY@SMT_P01
+
+...全般統制
+
+....b_サインオン_EBS:151029:151029
+SELECT
+       'EBS' AS システム区分
+     , FU.USER_NAME || ':' || FU.DESCRIPTION AS ユーザーＩＤ
+     , XFL.LOGIN_ID AS ログインＩＤ
+     , NULL AS クライアントプログラム
+     , NULL AS モジュール
+     , NULL AS マシーン
+     , ROUND( XFLR.START_TIME, 'MI' ) AS ＬＯＧＯＮ時間
+     , MAX( XFLR.END_TIME ) AS ＬＯＧＯＦＦ時間
+     , ( SELECT HOST_NAME FROM V$INSTANCE ) AS ＬＯＧＯＮ端末
+FROM
+       apps.XXAUT_FND_LOGINS XFL
+     , apps.XXAUT_FND_LOGIN_RESP XFLR
+     , apps.FND_USER FU
+WHERE
+       XFL.USER_ID = FU.USER_ID
+AND    XFL.LOGIN_ID = XFLR.LOGIN_ID
+AND    XFLR.RESPONSIBILITY_ID = (SELECT RESPONSIBILITY_ID FROM apps.FND_RESPONSIBILITY_TL WHERE RESPONSIBILITY_NAME = '01_システム管理者' AND LANGUAGE = 'JA')
+and    XFLR.START_TIME BETWEEN TO_DATE(:開始日YYYYMMDD,'YYYYMMDD') AND TO_DATE(:終了日YYYYMMDD,'YYYYMMDD') + 1 - 1/24/3600
+GROUP BY
+       FU.USER_NAME || ':' || FU.DESCRIPTION
+     , XFL.LOGIN_ID
+     , ROUND( XFLR.START_TIME, 'MI' )
+ORDER BY 7 DESC
+
+....c_アクセス監視_OracleDB:151029:151029
+SELECT * FROM  APPS.XXAUT_アクセスログ
+ WHERE システム区分 = 'ORACLE'
+   AND ＬＯＧＯＮ時間 BETWEEN TO_DATE(:開始日YYYYMMDD,'YYYYMMDD') AND TO_DATE(:終了日YYYYMMDD,'YYYYMMDD')+ 1 - 1/24/3600
+
+....e_本番登録依頼票:151029:151029
+
+....g_コンパイルログ:151029:151029
+
+..tool:151030:151030
+
+...Selenium:151030:151030
+ruby web-drver
+
+-- Proxy設定をUNSETする
+set http_proxy=
+
+....502 error:151030:151030
+ruby web-drver
+
+-- Proxy設定をUNSETする
+set http_proxy=
+
+...Forms:120918:151030
+
+....XXPOFC02 Compile:120614:151030
+cd /appl/post/fmb
+fcomp XXPOFC02
+
+cd /appl/post/fmx
+chmod 666 XXPOFC02.fmx
+cp -p /appl/post/fmx/XXPOFC02.fmx $XXPO_TOP/forms/JA
+cp -p /appl/post/fmx/XXPOFC02.fmx /appl/pub/fmx
+
+
+....XXPOFC03 Compile:120614:150731
+cd /appl/post/fmb
+fcomp XXPOFC03
+
+cd /appl/post/fmx
+chmod 666 XXPOFC03.fmx
+cp -p /appl/post/fmx/XXPOFC03.fmx $XXPO_TOP/forms/JA
+cp -p /appl/post/fmx/XXPOFC03.fmx /appl/pub/fmx
+
+....XXPOFA01 Compile:120828:120828
+cd /appl/post/fmb
+fcomp XXPOFA01
+
+cd /appl/post/fmx
+chmod 666 XXPOFA01.fmx
+cp -p /appl/post/fmx/XXPOFA01.fmx $XXPO_TOP/forms/JA
+cp -p /appl/post/fmx/XXPOFA01.fmx /appl/pub/fmx
+
+....XXOMFA01 Compile:120907:120907
+cd /appl/post/fmb
+fcomp XXOMFA01
+
+cd /appl/post/fmx
+chmod 666 XXOMFA01.fmx
+cp -p /appl/post/fmx/XXOMFA01.fmx $XXOM_TOP/forms/JA
+cp -p /appl/post/fmx/XXOMFA01.fmx /appl/pub/fmx
+
+....XXPOFA09:120927:150416
+cd /appl/post/fmb
+fcomp XXPOFA09
+
+cd /appl/post/fmx
+chmod 666 XXPOFA09.fmx
+cp -p /appl/post/fmx/XXPOFA09.fmx $XXPO_TOP/forms/JA
+cp -p /appl/post/fmx/XXPOFA09.fmx /appl/pub/fmx
+
+....クリップボードから:150408:150408
+cd /appl/post/fmb
+fcomp XXPOFA01
+
+cd /appl/post/fmx
+chmod 666 XXPOFA01.fmx
+cp -p /appl/post/fmx/XXPOFA01.fmx $XXPO_TOP/forms/JA
+cp -p /appl/post/fmx/XXPOFA01.fmx /appl/pub/fmx
+....XXIVFA03:130116:130116
+cd /appl/post/fmb
+fcomp XXIVFA03
+
+cd /appl/post/fmx
+chmod 666 XXIVFA03.fmx
+cp -p /appl/post/fmx/XXIVFA03.fmx $XXIV_TOP/forms/JA
+cp -p /appl/post/fmx/XXIVFA03.fmx /appl/pub/fmx
+
+....XXAPFN02:130215:130215
+cd /appl/post/fmb
+fcomp XXAPFN02
+
+cd /appl/post/fmx
+chmod 666 XXAPFN02.fmx
+cp -p /appl/post/fmx/XXAPFN02.fmx $XXAP_TOP/forms/JA
+cp -p /appl/post/fmx/XXAPFN02.fmx /appl/pub/fmx
+
+....XXOMFA05:130409:130409
+cd /appl/post/fmb
+fcomp XXOMFA05
+
+cd /appl/post/fmx
+chmod 666 XXOMFA05.fmx
+cp -p /appl/post/fmx/XXOMFA05.fmx $XXOM_TOP/forms/JA
+cp -p /appl/post/fmx/XXOMFA05.fmx /appl/pub/fmx
+
+....XXOMFA07:131003:131028
+cd /appl/post/fmb
+fcomp XXOMFA07
+
+cd /appl/post/fmx
+chmod 666 XXOMFA07.fmx
+cp -p /appl/post/fmx/XXOMFA07.fmx $XXOM_TOP/forms/JA
+cp -p /appl/post/fmx/XXOMFA07.fmx /appl/pub/fmx
+
+....XXARFN02:130215:130215
+cd /appl/post/fmb
+fcomp XXARFN02
+
+cd /appl/post/fmx
+chmod 666 XXARFN02.fmx
+cp -p /appl/post/fmx/XXARFN02.fmx $XXAR_TOP/forms/JA
+cp -p /appl/post/fmx/XXARFN02.fmx /appl/pub/fmx
+
+....XXOMFA09:130702:131030
+cd /appl/post/fmb
+fcomp XXOMFA10
+
+cd /appl/post/fmx
+chmod 666 XXOMFA10.fmx
+cp -p /appl/post/fmx/XXOMFA10.fmx $XXOM_TOP/forms/JA
+cp -p /appl/post/fmx/XXOMFA10.fmx /appl/pub/fmx
+
+....XXMAFN03:150609:150609
+cd /appl/post/fmb
+fcomp XXMAFN03
+
+cd /appl/post/fmx
+chmod 666 XXMAFN03.fmx
+cp -p /appl/post/fmx/XXMAFN03.fmx $XXMA_TOP/forms/JA
+cp -p /appl/post/fmx/XXMAFN03.fmx /appl/pub/fmx
+
+....XXOMFE01:131029:131029
+cd /appl/post/fmb
+fcomp XXOMFE01
+
+cd /appl/post/fmx
+chmod 666 XXOMFE01.fmx
+cp -p /appl/post/fmx/XXOMFE01.fmx $XXOM_TOP/forms/JA
+cp -p /appl/post/fmx/XXOMFE01.fmx /appl/pub/fmx
+
+....Form Text化:121221:161006
+ruby make_object_report.rb C:\nippan-work\trunk\Library\EBS\XXAP\forms\fmb
+ruby make_object_report.rb C:\nippan-work\trunk\Library\EBS\XXAR\forms\fmb
+ruby make_object_report.rb C:\nippan-work\trunk\Library\EBS\XXCM\forms\fmb
+ruby make_object_report.rb C:\nippan-work\trunk\Library\EBS\XXEI\forms\fmb
+ruby make_object_report.rb C:\nippan-work\trunk\Library\EBS\XXFE\forms\fmb
+ruby make_object_report.rb C:\nippan-work\trunk\Library\EBS\XXGL\forms\fmb
+ruby make_object_report.rb C:\nippan-work\trunk\Library\EBS\XXIF\forms\fmb
+ruby make_object_report.rb C:\nippan-work\trunk\Library\EBS\XXIV\forms\fmb
+ruby make_object_report.rb C:\nippan-work\trunk\Library\EBS\XXMA\forms\fmb
+ruby make_object_report.rb C:\nippan-work\trunk\Library\EBS\XXMT\forms\fmb
+ruby make_object_report.rb C:\nippan-work\trunk\Library\EBS\XXOM\forms\fmb
+ruby make_object_report.rb C:\nippan-work\trunk\Library\EBS\XXPO\forms\fmb
+
+C:\orant\BIN\ifcmp60 module=XXFELZ10.pll userid=apps/apps@gss module_type=library batch=yes script=yes output_file=XXFELZ10.pld 
+
+--
+ruby create_all_object_report.rb C:\nippan-work\trunk\Library\EBS\
+
+
+ruby create_all_object_report.rb \\192.168.3.18\share\ライブラリ\Library\Post_backup\2013年\20130322
+
+....pll compile:130318:161006
+$ORACLE_HOME/bin/f60gen module=$AU_TOP/resource/HRLOCAL.pll userid=apps/<パスワード> output_file=$AU_TOP/resource/HRLOCAL.plx module_type=library batch=yes compile_all=special
+
+
+
+
+C:\orant\BIN\ifcmp60 module=XXFELZ10.pll userid=apps/apps@gss module_type=library batch=yes script=yes output_file=XXFELZ10.pld 
+
+...Subversion:130205:130205
+
+....subversion リリース用:130205:130205
+svn status \\192.168.3.18\share\ライブラリ\Library\Pub\EBS
+svn status \\192.168.3.18\share\ライブラリ\Library\Pub\SVF
+
+....backup:130107:161114
+svnadmin dump c:\\svn > svndump2012.dmp
+svnadmin dump --incremental --revision 125:131 c:\\svn > svndump_rev125_131.dmp
+svnadmin dump --incremental --revision 132:HEAD c:\\svn > svndump_rev132.dmp
+
+
+svnadmin dump c:\\svn > svndump20131203.dmp
+
+rev:140	2013/04/05
+
+rev:147	2013/07/03
+
+svnadmin dump c:\\svn > svndump20130705.dmp
+
+
+追加
+svnadmin load c:\\svn < svndump_rev149.dmp
+
+
+
+svnadmin dump c:\\svn > svndump2013.dmp
+
+2014/02/27 rev.167
+svnadmin dump c:\\svn > svndump20140227.dmp
+
+svnadmin dump C:\\Repositories\\Nippan  > svndump20140228.dmp
+
+2015/04/07
+svnadmin dump C:\\Repositories\\Nippan  > svndump20150407.dmp
+rev:213
+
+svnadmin dump c:\\svn > svndump2015.dmp
+svnadmin dump C:\\Repositories\\Nippan  > svndump2015.dmp
+svnadmin dump C:\\Repositories\\Nippan  > svndump20161114.dmp
+
+...SVF:150424:151030
+XXOMRA01
+XXOMW_注文請書
+
+XXOMRB01
+XXOMW_出荷案内書＿鋼材
+
+XXOMRB02
+XXOMW_出荷案内書＿非鋼材
+
+XXOMRB05
+XXOMW_出荷案内書＿鋼材
+
+XXOMRB06
+XXOMW_出荷案内書＿非鋼材
+
+XXOMRD07
+XXOMW_日金工商事注文請書
+
+...Git:131210:131210
+git config --global http.proxy http://proxy.np-nippan.co.jp:8080/
+
+...wget proxy:131127:131127
+wget -q -O - --no-check-certificate wget -e HTTPS_PROXY=http://proxy.np-nippan.co.jp:8080 https://github.com/nvie/gitflow/raw/develop/contrib/gitflow-installer.sh | bash
+...ファイル検索:170417:170615
+findstr /D:"C:\nippan-work\trunk\Library\EBS" /N /S /I /g:table.lst *.sql > filelst.txt
+findstr /D:"C:\nippan-work\trunk\Library\EBS" /N /S /I /g:table.lst *.txt >> filelst.txt
+findstr /D:"C:\nippan-work\trunk\DDL" /N /S /I /g:table.lst *.sql  >> filelst.txt
+findstr /D:"C:\nippan-work\trunk\Library\EBS" /N /S /I /g:tableUTF8.lst *.eex >> filelst.txt
+findstr /D:"C:\nippan-work\trunk\Library\SVF" /N /S /I /g:table.lst *.vrq >> filelst.txt
+
+..未整理:120918:151030
+...sql trace:171024:171025
+ALTER SESSION SET TIMED_STATISTICS=TRUE
+ALTER SESSION SET MAX_DUMP_FILE_SIZE=UNLIMITED;
+ALTER SESSION SET TRACEFILE_IDENTIFIER='SQLTRACE';
+ALTER SESSION SET EVENTS 'sql_trace wait=true,bind=true,plan_stat=adaptive';
+
+ALTER SESSION SET SQL_TRACE=TRUE;
+ALTER SESSION SET SQL_TRACE=FALSE;
+
+
+...20170802送状:170802:170802
+select 
+ZZ.ZZIKO001X.get_m_sojo_bng(仕入先サイトコード, 送状ＮＯ, メーカー契約ＮＯ) 送状番号,
+ZZ.ZZIKO001X.get_m_sojo_gb(仕入先サイトコード, 送状ＮＯ, 明細行番号) 送状行番,
+送状ＮＯ,
+出荷ＮＯ,
+出荷日,
+メーカー契約ＮＯ,
+発注ＮＯ,
+明細行番号,
+部署コード,
+部署名,
+仕入先サイトコード,
+仕入先サイト名,
+個別管理ＮＯ
+
+FROM XXPO.XXPOT_仕入詳細
+WHERE TO_CHAR("受入日",'YYYY/MM/DD') >= '2016/04/01' and ＰＯ受入取引ＩＤ IS NOT NULL
+...oracle imp/exp:170707:170707
+chgdb
+exp system/manager tablespaces=APPS_TS_QUEUES file=20170707APPS_TS_QUEUES.dmp
+imp system/manager TABLESPACES=APPS_TS_QUEUES file=20170707APPS_TS_QUEUES.dmp ignore=y FULL=Y
+
+...idgrepre.cfgから:120815:120815
+"C:\nippan-work\trunk\Library\EBS\XXIV\plsql\XXIVPA09B.sql"(563,13,12)	メーカー契約ＮＯ  = rec_個別管理ＮＯ.メーカー契約ＮＯ
+..ごみ箱:151030:151030
+...新規:170802:170802
+
+.20171124日新付着量:171124:171124
+  SELECT 'H00'||LPAD(b.segment1,8,0)                 発注番号
+        ,LPAD( TO_CHAR( TO_NUMBER( NVL( d.発注明細行番号, d.受注明細行番号 ) ) ), 2, '0' ) 行番号
+        ,c.銘柄コード
+        ,NVL(c.目付コード, d.目付コード) 目付コード
+        ,ZZ.ZZIKO001.get_ns_fuchakry_c(d.日新品名コード, d.日新受注規格区分, d.日新受注規格コード) 変換付着量
+        ,d.日新品名コード
+        ,d.日新受注規格区分
+        ,d.日新受注規格コード
+  FROM   PO.PO_LINES_ALL                 a
+        ,PO.PO_HEADERS_ALL               b
+        ,APPS.XXIVM_品目_V               c
+        ,XXPO.XXPOT_発注明細追加属性     d
+        ,XXPO.XXPOT_発注ヘッダー追加属性 f
+  WHERE a.po_header_id     = b.po_header_id
+  AND   a.item_id          = c.ＩＮＶ品目ＩＤ
+  AND   c.ＩＮＶ在庫組織ＩＤ = 103    -- システムパラメータの品目検証組織
+  AND   a.po_line_id       = d.ＰＯ発注明細ＩＤ
+  AND   a.po_header_id     = f.ＰＯ発注ヘッダーＩＤ
+  AND   NVL(a.cancel_flag, 'N')     <> 'Y'
+  AND   f.発注日          >= TO_DATE(:fuka_zokusei1,'yyyymmdd')
+  AND   f.発注日          <= TO_DATE(:fuka_zokusei2,'yyyymmdd')
+  AND   b.APPROVED_DATE IS NOT NULL
+  -- 加工賃は除く
+  AND   NOT EXISTS ( SELECT 1
+                     FROM   XXPO.XXPOT_賃加工依頼ヘッダー e
+                     WHERE  a.po_header_id  = e.ＰＯ発注ヘッダーＩＤ
+                     )
+  -- EBSの見積データは除く
+  AND    b.po_header_id <> 1
+and d.日新品名コード IS NOT NULL
+and NVL(c.目付コード, d.目付コード) <> ZZ.ZZIKO001.get_ns_fuchakry_c(d.日新品名コード, d.日新受注規格区分, d.日新受注規格コード)
+
+.Oracle:170615:170721
+
+...SYSDBA:170628:170704
+sqlplus
+conn system/manager
+conn / AS SYSDBA
+
+...oracle buffer:160127:170615
+SELECT o.object_name,count(*) number_of_blocks
+ FROM dba_objects o,v$bh bh
+ WHERE o.data_object_id = bh.objd
+ AND o.owner NOT IN('SYS','SYSTEM','SYSMAN')
+ GROUP BY o.object_name
+ ORDER BY count(*)
+
+...OPEN_CURSORS:170615:170615
+SELECT s.sid,username,
+ (SUM(DECODE(name,'opened cursors cumulative',value,0))) "OPENED CURSOR",
+ (SUM(DECODE(name,'opened cursors current',value,0))) "CURRENT CURSOR"
+ FROM v$session s,v$sesstat se,v$statname sn
+ WHERE se.sid = s.sid
+ AND se.statistic# = sn.statistic#
+ AND name in ('opened cursors cumulative','opened cursors current')
+ AND username is not null
+ GROUP BY s.sid,username
+ ORDER BY "OPENED CURSOR" desc,"CURRENT CURSOR" desc
+
+
+--------------------------------------------------------------------------------------------------
+su - oracle
+--本番 P_01
+$z8JR27W
+
+--開発 D_01
+TasZ82e#
+
+sqlplus SMT11/SMT11 as SYSDBA
+
+show parameter open_cursors
+
+alter system set open_cursors=500;
+
+
+...TRACE:151125:171124
+cd /home/gss/gssdb/9.2.0/admin/gss_inippan02/udump
+
+ls -altr
+
+chgdb
+tkprof <<xxxx.trc>> <<xxxx.txt>> explain=apps/apps
+
+
+ALTER SESSION SET SQL_TRACE=TRUE;
+ALTER SESSION SET SQL_TRACE=FALSE;
+
+
+...tablespace 確認:170502:170502
+sqlplus / as sysdba
+SQL>
+set linesize 150 pages 5000
+col SEGMENT_NAME for a24
+select distinct T1.TABLESPACE_NAME, T1.FILE_ID,
+       T1.SEGMENT_TYPE, T1.OWNER||'.'||T1.SEGMENT_NAME "SEGMENT_NAME", T1.SEGMENT_TYPE
+  from DBA_EXTENTS T1
+ where ((T1.BLOCK_ID + 1) 
+        * (select BLOCK_SIZE 
+             from DBA_TABLESPACES T2
+            where T1.TABLESPACE_NAME = T2.TABLESPACE_NAME)) + BYTES > (&SIZE * 1024 * 1024)
+   and TABLESPACE_NAME = 'TBS17_FOR_TAB'
+ order by 1, 2;
+
+sizeに値を入力してください: 350
+
+TABLESPACE_NAME    FILE_ID SEGMENT_TYPE       SEGMENT_NAME             SEGMENT_TYPE
+--------------- ---------- ------------------ ------------------------ ------------------
+TBS17_FOR_TAB            7 INDEX              TRY.PK_TAB1_COL1         INDEX
+TBS17_FOR_TAB            7 INDEX              TRY.PK_TAB3_COL1         INDEX
+TBS17_FOR_TAB            7 INDEX              TRY.PK_TAB4_COL1         INDEX
+TBS17_FOR_TAB            7 TABLE              TRY.TAB4                 TABLE
+.SMART:170615:171016
+本番APサーバ	smt-p-ap01
+本番DBサーバ	smt-p-db01
+本番BIサーバ	smt-p-bi01
+	
+開発APサーバ	smt-d-ap01
+開発DBサーバ	smt-d-db01
+開発BIサーバ	smt-d-bi01
+
+
+本番APサーバ	
+tomcat		Hn4gnx97
+np_adm		dPw$z4Ra
+nssol_adm	dPw$z4Ra
+本番DBサーバ
+smtdbuser	9HneAnkD
+np_adm		dPw$z4Ra
+nssol_adm	dPw$z4Ra
+oracle		$z8JR27W
+
+開発APサーバ
+root		ura8C5X#
+tomcat		dPw$z4Ra
+np_adm		dPw$z4Ra
+nssol_adm	dPw$z4Ra
+
+開発DBサーバ
+root		3haJWq2$
+smtdbuser	dPw$z4Ra
+np_adm		dPw$z4Ra
+nssol_adm	dPw$z4Ra
+oracle		TasZ82e#
+
+ORACLE
+SMT01		dPs5UbvY
+SMT01/dPs5UbvY@smt_p01
+
+...移行ツール一覧:171113:171113
+1	マスター	ZZMS01B	機能群マスタ（EDIコード変換）	XXCMC_ＥＤＩコード変換	ＥＤＩコード変換ヘッダー
+2	マスター	ZZMS02B	機能群マスタ（EDIコード変換）	XXCMC_ＥＤＩコード変換	ＥＤＩコード変換明細
+3	マスター	ZZMS03B	機能群その他	XXEIW_新日鐵現品管理＿Ｄ＿Ｒ	XXEIW_新日鐵現品管理＿Ｄ＿Ｒ
+4	マスター	ZZMS04B	機能群マスタ（送り先）	XXCMM_送り先	送り先
+5	マスター	ZZMS05B	機能群マスタ（送り先）	XXCMM_商品	商品
+6	マスター	ZZMS06B	機能群マスタ（移動平均単価）	XXIVM_期間平均原価	移動平均単価
+7	マスター	ZZMS07B	機能群マスタ（移動平均単価）	XXIVM_期間平均原価	移動平均単価層別
+8	マスター	ZZMS11B	機能群マスタ（取引先）	XXCMW_取引先	取引先（取引先）
+9	マスター	ZZMS12B	機能群マスタ（取引先）	XXCMW_顧客	取引先（得意先）
+10	マスター	ZZMS13B	機能群マスタ（取引先）	XXCMW_仕入先	取引先（仕入先）
+11	マスター	ZZMS14B	機能群マスタ（取引先）	XXCMM_需要家	取引先（需要家）
+12	マスター	ZZMS15B	機能群マスタ（取引先）	XXCMW_顧客サイト	取引先サイト（得意先）
+13	マスター	ZZMS16B	機能群マスタ（取引先）	XXCMW_仕入先サイト	取引先サイト（仕入先）
+14	マスター	ZZMS17B	機能群マスタ（取引先）	XXCMM_需要家サイト	取引先サイト（需要家）
+15	マスター	ZZMS20B	機能群マスタ（送り先）	XXIVM_保管場所_V	倉庫
+16	マスター	ZZMS21B	機能群マスタ（登録マスタ）	XXPOM_鋼板引合伝票ヘッダー	日鉄住金鋼板_登録マスターヘッダー
+17	マスター	ZZMS22B	機能群マスタ（登録マスタ）	XXPOM_鋼板引合伝票明細	日鉄住金鋼板_登録マスター明細
+16	マスター	ZZMS24B	機能群マスタ（送り先）	XXCMM_銘柄	銘柄
+17	マスター	ZZMS25B	機能群マスタ（単価マスター）	XXPOM_単価	単価マスターヘッダー・明細
+18	加工管理	ZZKK01B	機能群トラン（加工依頼）	XXPOT_賃加工依頼明細	加工依頼ヘッダー
+19	加工管理	ZZKK02B	機能群トラン（加工依頼）	XXPOT_賃加工依頼明細	加工依頼製品明細
+20	加工管理	ZZKK03B	機能群トラン（加工依頼）	XXPOT_加工母材製品	加工依頼母材明細
+21	加工管理	ZZKK04B	機能群トラン（加工実績）	加工依頼ヘッダー_移行元ワーク	加工実績ヘッダー
+22	加工管理	ZZKK05B	機能群トラン（加工実績）	加工依頼製品明細_移行元ワーク	加工実績製品明細
+23	加工管理	ZZKK06B	機能群トラン（加工実績）	加工依頼母材明細_移行元ワーク	加工実績母材明細
+24	企業間IF	ZZKG01B	機能群トラン（企業間IF）	XXCMM_日新取引先	日新取引先
+25	企業間IF	ZZKG02B	機能群トラン（企業間IF）	XXEIW_鋼板請求＿Ｄ＿Ｒ	XXEIW_鋼板請求＿Ｄ＿Ｒ
+26	企業間IF	ZZKG03B	機能群トラン（注文（メーカー毎））	XXEIW_日新注文履歴＿Ｓ	日新製鋼_注文申込ヘッダー
+27	企業間IF	ZZKG04B	機能群トラン（注文（メーカー毎））	XXEIW_日新注文履歴＿Ｄ	日新製鋼_注文申込明細
+28	企業間IF	ZZKG05B	機能群トラン（注文（メーカー毎））	XXEIW_新日鐵注文履歴＿Ｓ１	新日鐵住金_注文_ヘッダー_熱延
+29	企業間IF	ZZKG06B	機能群トラン（注文（メーカー毎））	XXEIW_新日鐵注文履歴＿Ｄ１	新日鐵住金_注文_明細_熱延
+30	企業間IF	ZZKG07B	機能群トラン（注文（メーカー毎））	XXEIW_新日鐵注文履歴＿Ｓ２	新日鐵住金_注文_ヘッダー_冷延・表面処理
+31	企業間IF	ZZKG08B	機能群トラン（注文（メーカー毎））	XXEIW_新日鐵注文履歴＿Ｄ２	新日鐵住金_注文_明細_冷延・表面処理
+32	企業間IF	ZZKG09B	機能群トラン（注文（メーカー毎））	XXEIW_新日鐵注文履歴＿Ｓ３	新日鐵住金_注文_ヘッダー_冷延ステンレス
+33	企業間IF	ZZKG10B	機能群トラン（注文（メーカー毎））	XXEIW_新日鐵注文履歴＿Ｄ３	新日鐵住金_注文_明細_冷延ステンレス
+34	在庫管理	ZZZK01B	機能群トラン（在庫）	手持在庫	在庫
+35	在庫管理	ZZZK02B	機能群トラン（在庫引当）	予約情報	在庫引当
+36	在庫管理	-	-	（個別管理番号）	個別管理番号採番（共通関数化）
+37	在庫管理	-	-	（個別管理番号）	集約管理品層別（共通関数化）
+38	仕入管理	ZZSI01B	機能群トラン（仕入）	受入明細	仕入ヘッダー
+39	仕入管理	ZZSI02B	機能群トラン（仕入）	受入明細	仕入明細
+40	仕入管理	ZZSI03B	機能群その他	XXEIT_引取依頼	日新製鋼_引取依頼
+41	受注管理	ZZJC01B	機能群トラン（受注）	受注明細	受注ヘッダー
+42	受注管理	ZZJC02B	機能群トラン（受注）	受注明細	受注明細
+43	需給管理	ZZJK01B	機能群トラン（需給管理）	XXEIT_新日鐵納入	ＦＬＩＣＳ納入情報
+44	需給管理	ZZJK02B	機能群トラン（需給管理）	XXEIT_新日鐵実績	新日鐵住金実績
+45	需給管理	ZZJK03B	機能群トラン（需給管理）	XXEIT_新日鐵投入状況	投入状況
+46	売上管理	ZZUA01B	機能群トラン（売上）	XXOMT_出荷売上	売上ヘッダー
+47	売上管理	ZZUA02B	機能群トラン（売上）	XXOMT_出荷売上	売上明細
+48	発注管理	ZZHC01B	機能群トラン（発注）	発注明細	発注ヘッダー
+49	発注管理	ZZHC02B	機能群トラン（発注（メーカー毎））	発注明細	新日鐵住金_発注ヘッダー
+50	発注管理	ZZHC03B	機能群トラン（発注（メーカー毎））	発注明細	日新製鋼_発注ヘッダー
+51	発注管理	ZZHC04B	機能群トラン（発注（メーカー毎））	発注明細	日鉄住金鋼板_発注ヘッダー
+52	発注管理	ZZHC05B	機能群トラン（発注）	発注明細	発注明細
+53	発注管理	ZZHC06B	機能群トラン（発注（メーカー毎））	発注明細	新日鐵住金_発注明細
+54	発注管理	ZZHC07B	機能群トラン（発注（メーカー毎））	発注明細	日新製鋼_発注明細
+54	発注管理	ZZHC08B	機能群トラン（発注（メーカー毎））	発注明細	日鉄住金鋼板_発注明細
+54	共通関数	ZZIKO001	-	-	共通関数
+55	共通関数	ZZIKO002	-	-	共通関数（販売形態区分）
+
+...新規ユーザー登録パスワード変更:171110:171110
+select 'SMT11' env, s.id, s.sid, s.display_name, p.password from SMT11.V_JUGYOIN j , SMT11.SID s, SMT11.USER_PASSWORD p
+where j.JUGYOIN_C LIKE :従業員コード
+and j.USER_S_ID = s.NORM_SID
+and p.id = s.id
+UNION ALL
+select 'SMT12' env, s.id, s.sid, s.display_name, p.password from SMT12.V_JUGYOIN j , SMT12.SID s, SMT12.USER_PASSWORD p
+where j.JUGYOIN_C LIKE :従業員コード
+and j.USER_S_ID = s.NORM_SID
+and p.id = s.id
+UNION ALL
+select 'SMT13' env, s.id, s.sid, s.display_name, p.password from SMT13.V_JUGYOIN j , SMT13.SID s, SMT13.USER_PASSWORD p
+where j.JUGYOIN_C LIKE :従業員コード
+and j.USER_S_ID = s.NORM_SID
+and p.id = s.id
+;
+
+-----------------------------------------------------------------------
+UPDATE SMT12.USER_PASSWORD a
+   SET password = (SELECT b.password FROM SMT11.USER_PASSWORD b WHERE b.id = :sid)
+ WHERE a.id = :sid
+;
+
+UPDATE SMT13.USER_PASSWORD a
+   SET password = (SELECT b.password FROM SMT11.USER_PASSWORD b WHERE b.id = :sid)
+ WHERE a.id = :sid
+;
+
+...smart trace:171108:171108
+DBMS_SESSION.SET_SQL_TRACE(TRUE);
+DBMS_SESSION.SET_SQL_TRACE(FALSE);
+
+
+su - oracle
+TasZ82e#
+cd /u01/app/oracle/product/12.1.0.2/dbhome_1/rdbms/log
+
+...売上申請Sequence:171106:171106
+DROP SEQUENCE SMT51.SQ_URIAGE_SINSE_BNG
+/
+CREATE SEQUENCE SMT51.SQ_URIAGE_SINSE_BNG
+INCREMENT BY 1
+START WITH 20
+MAXVALUE 99999999999
+NOMINVALUE
+CYCLE 
+NOCACHE
+ORDER 
+/
+
+...ファイル場所:171011:171011
+#メッセージinsert SQL
+C:\Users\CCI7.TOKYO1\Documents\10_SMART\svn_wk\smart-parent\message
+m_msg.sql
+
+...画面開発:170727:170727
+http://localhost:8080/smart-web/CM9900G1/init
+..引合伝票:170615:170615
+
+...hdr:170206:170615
+select TOROKU_MST_BNG, t.* from (
+select ZZIKO001X.get_hikiai_dempyo_c(KYK_BNG_EDI, '2') 引合伝票番号, h.* from ZZ_T_NISC_HATCHU_HDR_MOTO_WK h
+) t, ZZ_M_TOROKU_MST_HDR_MOTO_WK m
+where t.引合伝票番号 = m.HIKIAI_DEMPYO_BNG(+)
+
+
+select ZZIKO001X.get_hikiai_dempyo_c(KYK_BNG_EDI, '2') 引合伝票番号, h.* from ZZ_T_NISC_HATCHU_MSI_MOTO_WK h
+
+--2017/02/07
+select ZZIKO001X.get_hikiai_dempyo_c(n.CHUMN_MST_BNG_EDI, n.CHUMN_MST_BNG_GB_EDI, '1') 引合伝票番号, 
+ZZIKO001X.get_hikiai_dempyo_c(n.CHUMN_MST_BNG_EDI, n.CHUMN_MST_BNG_GB_EDI, '2') 引合伝票明細番号, h.* from ZZ_T_HATCHU_MSI_MOTO_WK h,ZZ_T_NISC_HATCHU_MSI_MOTO_WK n
+where h.hikiai_dempyo_bng IS NOT NULL
+and h.HATCHU_BNG = n.HATCHU_BNG
+and h.HATCHU_MSIBNG = n.HATCHU_MSIBNG
+
+--2017/02/08
+select ZZIKO001X.get_hikiai_dempyo_c(n.KYK_BNG_EDI, n.KYK_BNG_GB_EDI, '0') 引合伝票番号, n.* from ZZ_T_HATCHU_MSI_MOTO_WK h,ZZ_T_NISC_HATCHU_MSI_MOTO_WK n
+where h.hikiai_dempyo_bng IS NOT NULL
+and h.HATCHU_BNG = n.HATCHU_BNG
+and h.HATCHU_MSIBNG = n.HATCHU_MSIBNG
+
+.EBS:170615:170721
+E-Business Suite Diagnostics 11i Test Catalog (ドキュメントID 179661.1)
+
+..調査:170615:170615
+
+...XXPOFX03:120918:151030
+cd /appl/post/fmb
+fcomp XXPOFX03
+
+cd /appl/post/fmx
+chmod 666 XXPOFX03.fmx
+cp -p /appl/post/fmx/XXPOFX03.fmx $XXPO_TOP/forms/JA
+cp -p /appl/post/fmx/XXPOFX03.fmx /appl/pub/fmx
+
+...HB01882:130228:130228
+
+										8.0.36	HB01882	コンパイルエラー対応のため日新、新日鐵の処理を分割
+
+-- 8.0.36 2013/02/28 PK_PRE_CHECK_日新に移動
+
+...HB01851 リリース:130117:130125
+
+create table XXMAT_売買金利１_bk201301 as select * from XXMAT_売買金利１
+
+
+insert into XXMAT_売買金利１＿按分前 select * from XXMAT_売買金利１
+
+insert into XXMAT_売買金利２＿按分前 select * from XXMAT_売買金利２
+
+insert into XXMAT_在庫金利＿按分前 select * from XXMAT_在庫金利
+
+insert into XXMAT_管理会計勘定残高＿按分前 select * from XXMAT_管理会計勘定残高
+
+...ORACLE テーブル情報:170421:170421
+SELECT SEGMENT_NAME
+,BYTES
+,BYTES/1024 K_BYTES
+,BYTES/1024/1024 M_BYTES
+,BYTES/1024/1024/1024 G_BYTES
+FROM DBA_SEGMENTS
+WHERE SEGMENT_NAME = :TAB_NAME
+
+...おまじないSQL:130416:130416
+--*************************** ＯＢ参照時に特殊ビューのセキュリティをはずすＳＱＬ（例．XXGLT_合計残高試算表＿月次_V）
+--ＯＢのSQL画面に以下を置いて実行後、通常通りにビューを参照
+
+--ebs11i GL本社用
+begin
+  dbms_application_info.set_client_info(102);   -- ORG_IDを設定
+  apps.FND_PROFILE.put('GL_SET_OF_BKS_ID', '1001');  -- GL_SET_OF_BOOKS_IDを設定
+  apps.FND_PROFILE.put('RESP_APPL_ID','101');        -- APPL_ID
+  apps.FND_PROFILE.put('RESP_ID','50325');           -- 職責ID GL_本社財務
+end;
+
+--ebs11i AR本社財務
+begin
+  dbms_application_info.set_client_info(102);   -- ORG_IDを設定
+  apps.FND_PROFILE.put('GL_SET_OF_BKS_ID', '1001');  -- GL_SET_OF_BOOKS_IDを設定
+  apps.FND_PROFILE.put('RESP_APPL_ID','222');        -- APPL_ID
+  apps.FND_PROFILE.put('RESP_ID','50306');           -- 職責ID
+end;
+
+--ebs11i AP本社財務
+begin
+  dbms_application_info.set_client_info(102);   -- ORG_IDを設定
+  apps.FND_PROFILE.put('GL_SET_OF_BKS_ID', '1001');  -- GL_SET_OF_BOOKS_IDを設定
+  apps.FND_PROFILE.put('RESP_APPL_ID','200');        -- APPL_ID
+  apps.FND_PROFILE.put('RESP_ID','50315');           -- 職責ID
+end;
+
+--*************************** 上記の各ＩＤを調査するＳＱＬ
+
+--ORG_ID取得
+SELECT ORGANIZATION_ID
+      ,NAME
+      ,COMMENTS
+      ,BUSINESS_GROUP_ID
+  FROM HR_ORGANIZATION_UNITS
+ WHERE ORGANIZATION_ID = 102	--**「102 日本鐵板株式会社」会計はこれが固定
+ ORDER BY ORGANIZATION_ID ;
+
+
+-- GL_SET_OF_BOOKS_ID取得
+SELECT SET_OF_BOOKS_ID
+     , NAME
+     , SHORT_NAME
+  FROM GL_SETS_OF_BOOKS
+ WHERE SET_OF_BOOKS_ID = 1001	--**「1001 日本鐵板帳簿 01_BOOK」を使用。（単一帳簿）
+;
+
+-- APPL_ID取得
+--Receivables		ＡＲ債権管理
+--Payables			ＡＰ債務管理
+--General Ledger	ＧＬ一般会計
+--Addon_XXXXXXXX	アドオン
+
+SELECT *
+  FROM FND_APPLICATION_TL
+ WHERE APPLICATION_NAME IN('Receivables','Payables','General Ledger')
+   AND LANGUAGE         = 'JA'
+ ORDER BY APPLICATION_ID
+;
+
+SELECT *
+  FROM FND_APPLICATION_TL
+ WHERE APPLICATION_NAME LIKE 'Addon_%'
+   AND LANGUAGE         = 'JA'
+ ORDER BY APPLICATION_ID
+;
+
+-- 職責取得
+SELECT FRV.RESPONSIBILITY_ID	 AS "ID"
+      ,FRV.RESPONSIBILITY_NAME   AS "職責名"
+      ,FA1.APPLICATION_NAME      AS "アプリケーション"
+      ,FRV.RESPONSIBILITY_KEY    AS "職責キー"
+      ,FRV.DESCRIPTION           AS "摘要"
+  FROM FND_RESPONSIBILITY_VL FRV
+      ,FND_APPLICATION_VL    FA1
+ WHERE FRV.RESPONSIBILITY_NAME IN('01_GL_本社財務','01_AR_本社財務','01_AP_本社財務')
+   AND FA1.APPLICATION_ID    (+) = FRV.APPLICATION_ID
+ ORDER BY FRV.RESPONSIBILITY_NAME
+         ,FRV.RESPONSIBILITY_KEY
+;
+
+
+
+...EBS WF 件数SQL:170420:170420
+select c.item_type child, decode(c.end_date,null,'OPEN','CLOSED') child_status, 
+c.parent_item_type parent, decode(c.parent_item_type,null,'NOPARENT',decode(p.end_date,null,'OPEN','CLOSED')) parent_status, 
+count(*) 
+from 
+wf_items p, 
+wf_items c 
+where 
+p.item_type(+) = c.parent_item_type 
+and p.item_key(+) = c.parent_item_key 
+group by c.item_type, decode(c.end_date,null,'OPEN','CLOSED'), c.parent_item_type , 
+decode(c.parent_item_type,null,'NOPARENT',decode(p.end_date,null,'OPEN','CLOSED')) 
+order by c.item_type , c.parent_item_type;
+
+CHILD_STATUS PARENT_STATUS がCLOSED がパージ対象
+
+
+select item_type,activity_status,count(*) 
+from apps.wf_item_activity_statuses 
+group by item_type,activity_status;
+
+select count(*) from apps.wf_items;
+
+select count(*) from apps.WF_ITEM_ATTRIBUTE_VALUES;
+
+select count(*) from apps.WF_ITEM_ACTIVITY_STATUSES;
+
+select count(*) from apps.WF_NOTIFICATION_ATTRIBUTES;
+
+
+...EBSコンカレント引数取得SQL:170420:170420
+SELECT p.USER_CONCURRENT_PROGRAM_NAME "NAME", 
+c.CONCURRENT_PROGRAM_NAME "INTERNAL",
+f.END_USER_COLUMN_NAME "PARAMETER",
+f.ENABLED_FLAG "ON_OFF",
+f.DEFAULT_VALUE,
+f.REQUIRED_FLAG, f.DESCRIPTION
+FROM FND_DESCR_FLEX_COL_USAGE_VL f, FND_CONCURRENT_PROGRAMS_TL p, fnd_concurrent_programs c
+WHERE substr(f.DESCRIPTIVE_FLEXFIELD_NAME,7,8)=c.CONCURRENT_PROGRAM_NAME
+and c.CONCURRENT_PROGRAM_ID = p.CONCURRENT_PROGRAM_ID
+--and p.USER_CONCURRENT_PROGRAM_NAME LIKE '%Workflow%' 
+and (f.DESCRIPTIVE_FLEXFIELD_NAME like '$SRS$.FNDWFPR%') 
+AND p.LANGUAGE = 'US'
+order by f.DESCRIPTIVE_FLEXFIELD_NAME, f.COLUMN_SEQ_NUM;
+...画面Disco使用実績SQL:151112:151202
+--画面使用回数
+select fu.user_name, fu.DESCRIPTION, TO_CHAR(fl.start_time, 'YYYY/MM') 年月, 'FORM' 区分, fft.user_form_name プログラム名, count(*)
+from 
+apps.fnd_user fu
+,apps.fnd_logins fl
+,apps.FND_LOGIN_RESP_FORMS flrf
+,apps.FND_FORM_TL fft
+where fl.start_time  BETWEEN TO_DATE('2014/01/01', 'YYYY/MM/DD') AND TO_DATE('2014/03/31', 'YYYY/MM/DD')  + 1 - 1/24/3600
+and fl.user_id = fu.user_id
+and fl.login_id = flrf.login_id
+and flrf.form_id = fft.form_id
+and fft.language = 'JA'
+group by fu.user_name, fu.DESCRIPTION, TO_CHAR(fl.start_time, 'YYYY/MM'), fft.user_form_name
+--DISCOVERER使用回数
+union
+SELECT  USER_NAME, DESCRIPTION name, q1.yyyymm, 'DISCO' 区分, q1.doc_name  プログラム名, q1.cnt
+FROM (
+	SELECT eqs.QS_DOC_NAME doc_name, TO_CHAR(eqs.QS_CREATED_DATE, 'YYYY/MM') YYYYMM, QS_CREATED_BY , count(*) cnt
+	  FROM APPS.EUL5_QPP_STATS eqs
+	 where eqs.QS_CREATED_DATE BETWEEN TO_DATE('2014/01/01', 'YYYY/MM/DD') AND TO_DATE('2014/03/31', 'YYYY/MM/DD') + 1 - 1/24/3600
+	 GROUP BY eqs.QS_DOC_NAME, TO_CHAR(eqs.QS_CREATED_DATE, 'YYYY/MM'), QS_CREATED_BY
+	) q1
+	,apps.FND_USER fu
+where fu.user_id = TO_NUMBER(REPLACE(q1.QS_CREATED_BY, '#'))
+
+--------------------------------------------
+select fu.user_name, fu.DESCRIPTION, TO_CHAR(fl.start_time, 'YYYY/MM') 年月, 'FORM' 区分, ff.form_name PGID, fft.user_form_name プログラム名, count(*)
+from 
+apps.fnd_user fu
+,apps.fnd_logins fl
+,apps.FND_LOGIN_RESP_FORMS flrf
+,apps.FND_FORM_TL fft
+,apps.FND_FORM ff
+where fl.start_time  BETWEEN TO_DATE('2014/01/01', 'YYYY/MM/DD') AND TO_DATE('2015/12/31', 'YYYY/MM/DD')  + 1 - 1/24/3600
+and fl.user_id = fu.user_id
+and fl.login_id = flrf.login_id
+and flrf.form_id = fft.form_id
+and flrf.form_id = ff.form_id
+and fft.language = 'JA'
+group by fu.user_name, fu.DESCRIPTION, TO_CHAR(fl.start_time, 'YYYY/MM'), ff.form_name, fft.user_form_name
+--DISCOVERER使用回数
+union
+SELECT  USER_NAME, DESCRIPTION name, q1.yyyymm, 'DISCO' 区分, NULL PGID, q1.doc_name  プログラム名, q1.cnt
+FROM (
+	SELECT eqs.QS_DOC_NAME doc_name, TO_CHAR(eqs.QS_CREATED_DATE, 'YYYY/MM') YYYYMM, QS_CREATED_BY , count(*) cnt
+	  FROM APPS.EUL5_QPP_STATS eqs
+	 where eqs.QS_CREATED_DATE BETWEEN TO_DATE('2014/01/01', 'YYYY/MM/DD') AND TO_DATE('2015/12/31', 'YYYY/MM/DD') + 1 - 1/24/3600
+	 GROUP BY eqs.QS_DOC_NAME, TO_CHAR(eqs.QS_CREATED_DATE, 'YYYY/MM'), QS_CREATED_BY
+	) q1
+	,apps.FND_USER fu
+where fu.user_id = TO_NUMBER(REPLACE(q1.QS_CREATED_BY, '#'))
+
+...コンカレント名取得SQL:140107:151030
+SELECT
+fcp.CONCURRENT_PROGRAM_NAME
+,fcpt.USER_CONCURRENT_PROGRAM_NAME
+FROM
+FND_CONCURRENT_PROGRAMS_TL fcpt
+,FND_CONCURRENT_PROGRAMS fcp
+where
+fcpt.concurrent_program_id = fcp.concurrent_program_id
+and fcpt.language = 'JA'
+and fcp.CONCURRENT_PROGRAM_NAME LIKE 'XXEI%'
+
+...INDEX調査:170425:170425
+ANALYZE INDEX ix_test VALIDATE STRUCTURE;
+SELECT * FROM INDEX_STATS;
+
+
+...日別STAT集計:170523:170523
+select sg.snap_date, ss.TEXT_SUBSET,MAX(ss.MODULE) MODULE ,SUM(ss.SORTS) SORTS,SUM(ss.FETCHES) FETCHES,SUM(ss.EXECUTIONS) EXECUTIONS,SUM(ss.LOADS) LOADS,SUM(ss.PARSE_CALLS) PARSE_CALLS,SUM(ss.DISK_READS) DISK_READS,SUM(ss.BUFFER_GETS) BUFFER_GETS,SUM(ss.ROWS_PROCESSED) ROWS_PROCESSED,MAX(ss.COMMAND_TYPE) COMMAND_TYPE,ss.HASH_VALUE,SUM(ss.CPU_TIME) CPU_TIME,SUM(ss.ELAPSED_TIME) ELAPSED_TIME,DECODE(SUM(ss.EXECUTIONS), 0, SUM(ss.ELAPSED_TIME), SUM(ss.ELAPSED_TIME) / SUM(ss.EXECUTIONS)) 実行時間
+from stats$sql_summary ss,
+(
+select s1.snap_date, dbid, instance_number, text_subset, hash_value, module, max(snap_id) snap_id
+from
+(
+select TRUNC(s.startup_time) snap_date, s.snap_time, ss.* 
+from stats$sql_summary ss,
+     stats$snapshot s
+where ss.snap_id = s.snap_id
+and  s.startup_time >= to_date(:開始日,'YYYYMMDD')
+and  ss.text_subset like '%'
+--and  ss.module like 'XX__F___'
+) s1
+group by snap_date, dbid, instance_number, text_subset, hash_value, module
+) sg
+where ss.snap_id = sg.snap_id
+and   ss.dbid = sg.dbid
+and   ss.instance_number = sg.instance_number
+and   ss.text_subset = sg.text_subset
+and   ss.hash_value = sg.hash_value
+and   ss.module = sg.module
+group by sg.snap_date, ss.text_subset, ss.hash_value
+..データ:170615:170615
+
+...XXCMM_発生要因区分:130215:130215
+SELECT
+       発生理由.差額発生理由区分
+     , 発生理由.差額発生理由区分名
+     , 発生理由.発生要因区分
+     , 発生要因.発生要因区分名
+FROM
+       XXCMM_差額発生理由 発生理由
+     , XXCMM_発生要因区分 発生要因
+WHERE
+       発生理由.サブシステム区分 = XXCMPZ01.C_債務管理
+AND    発生理由.有効フラグ       = XXCMPZ01.c_flg_on
+AND    発生理由.発生要因区分     = 発生要因.発生要因区分
+ORDER BY
+       発生理由.差額発生理由区分
+
+
+1.3
+
+0.85
+
+
+SELECT
+        差額発生理由区分
+     ,  差額発生理由区分名
+     ,  発生要因区分
+FROM
+        XXCMM_差額発生理由
+WHERE
+        サブシステム区分 = XXCMPZ01.C_債権管理
+AND     有効フラグ       = XXCMPZ01.c_flg_on
+ORDER BY
+        差額発生理由区分
+
+SELECT
+       発生理由.差額発生理由区分
+     , 発生理由.差額発生理由区分名
+     , 発生理由.発生要因区分
+     , 発生要因.発生要因区分名
+FROM
+       XXCMM_差額発生理由 発生理由
+     , XXCMM_発生要因区分 発生要因
+WHERE
+       発生理由.サブシステム区分 = XXCMPZ01.C_債権管理
+AND    発生理由.有効フラグ       = XXCMPZ01.c_flg_on
+AND    発生理由.発生要因区分     = 発生要因.発生要因区分
+ORDER BY
+       発生理由.差額発生理由区分
+
+...受払　112:130108:130108
+select *
+from XXIVT_新受払_V
+where 取引年月 = '201112'
+and ＩＮＶ在庫組織コード = '112'
+
+...金利按分　売上のない負担部門:130108:130108
+select 会計年月, 負担部門コード,sum(売買金利１金額),sum(残高金利金額)
+from XXMAT_売買金利１ 金利
+where 会計年月 >= '201204'
+AND (売買金利１金額 <> 0 OR 残高金利金額 <> 0)
+and not exists (select 1 from XXMAT_管理会計勘定残高 勘定残高
+                        where 勘定残高.会計年月 = 金利.会計年月
+                        and   勘定残高.負担部門コード = 金利.負担部門コード
+                        and   勘定残高.売上金額 <> 0)
+group by 会計年月, 負担部門コード
+
+
+select 会計年月, 負担部門コード,sum(売買金利２金額)
+from XXMAT_売買金利２ 金利
+where 会計年月 >= '201204'
+AND (売買金利２金額 <>　0)
+and not exists (select 1 from XXMAT_管理会計勘定残高 勘定残高
+                        where 勘定残高.会計年月 = 金利.会計年月
+                        and   勘定残高.負担部門コード = 金利.負担部門コード
+                        and   勘定残高.売上金額 <> 0)
+group by 会計年月, 負担部門コード
+
+
+...20161012 仕入詳細SQL:161012:161012
+SELECT ＥＢＳ要求ＩＤ
+      ,旬
+      ,発注ＮＯ
+      ,発注改訂番号
+      ,メーカー契約ＮＯ
+      ,明細行番号
+      ,送状ＮＯ
+      ,部署コード
+      ,部署名
+      ,需要家サイトコード
+      ,需要家サイト名
+      ,仕入先サイトコード
+      ,仕入先サイト名
+      ,顧客サイトコード
+      ,顧客サイト名
+      ,送り先コード
+      ,送り先名
+      ,品目コード
+      ,銘柄コード
+      ,銘柄名
+      ,営業部門コード
+      ,営業部門名
+      ,規格表示コード
+      ,規格表示名
+      ,表面処理コード
+      ,表面処理名
+      ,表面仕上コード
+      ,表面仕上名
+      ,目付コード
+      ,目付名
+      ,保護膜コード
+      ,保護膜名
+      ,色コード
+      ,寸法表示
+      ,コイル単重表示
+      ,品目名
+      ,メーカー規格コード
+      ,級コード
+      ,メーカーコード
+      ,メーカー名
+      ,品種コード
+      ,商品名
+      ,形状コード
+      ,板厚
+      ,幅
+      ,長さ
+      ,コイル単重ＭＩＮ
+      ,コイル単重ＭＡＸ
+      ,受入年月
+      ,受入日
+      ,受入員数
+      ,受入数量
+      ,受入換算重量
+      ,受入単価
+      ,受入金額
+      ,ＩＮＶ受入在庫組織コード
+      ,在庫組織名
+      ,受入保管場所コード
+      ,保管場所名
+      ,受入保管棚コード
+      ,個別管理ＮＯ
+      ,ＰＯ受入取引タイプ
+      ,消費税コード
+      ,消費税率
+      ,受入金額＿消費税
+      ,受入金額＿税込
+      ,営業担当者コード
+      ,営業担当者名
+      ,入力者従業員コード
+      ,入力者従業員名
+      ,出荷日
+      ,出荷ＮＯ
+      ,販売調整金
+      ,ＡＰ請求書番号
+      ,支払条件コード
+      ,支払条件名
+      ,ＰＯ発注ヘッダーＩＤ
+      ,ＰＯ発注明細ＩＤ
+      ,ＰＯ受入取引ＩＤ
+      ,作成プログラムＩＤ
+      ,作成日時
+      ,作成ユーザーＩＤ
+      ,最終更新プログラムＩＤ
+      ,最終更新日時
+      ,最終更新ユーザーＩＤ
+      ,一括訂正明細連番
+      ,ＮＩＰＳ仕入返品連番
+      ,基準単位コード
+      ,品目単位コード
+      ,発注明細摘要
+  FROM XXPO.XXPOT_仕入詳細
+  
+  
+  
+  
+  
+  SELECT ＥＢＳ要求ＩＤ
+      ,旬
+      ,発注ＮＯ
+      ,発注改訂番号
+      ,メーカー契約ＮＯ
+      ,明細行番号
+      ,送状ＮＯ
+      ,部署コード
+      ,部署名
+      ,需要家サイトコード
+      ,需要家サイト名
+      ,仕入先サイトコード
+      ,仕入先サイト名
+      ,顧客サイトコード
+      ,顧客サイト名
+      ,送り先コード
+      ,送り先名
+      ,品目コード
+      ,銘柄コード
+      ,銘柄名
+      ,営業部門コード
+      ,営業部門名
+      ,規格表示コード
+      ,規格表示名
+      ,表面処理コード
+      ,表面処理名
+      ,表面仕上コード
+      ,表面仕上名
+      ,目付コード
+      ,目付名
+      ,保護膜コード
+      ,保護膜名
+      ,色コード
+      ,寸法表示
+      ,コイル単重表示
+      ,品目名
+      ,メーカー規格コード
+      ,級コード
+      ,メーカーコード
+      ,メーカー名
+      ,品種コード
+      ,商品名
+      ,形状コード
+      ,板厚
+      ,幅
+      ,長さ
+      ,コイル単重ＭＩＮ
+      ,コイル単重ＭＡＸ
+      ,受入年月
+      ,受入日
+      ,受入員数
+      ,受入数量
+      ,受入換算重量
+      ,受入単価
+      ,受入金額
+      ,ＩＮＶ受入在庫組織コード
+      ,在庫組織名
+      ,受入保管場所コード
+      ,保管場所名
+      ,受入保管棚コード
+      ,個別管理ＮＯ
+      ,ＰＯ受入取引タイプ
+      ,消費税コード
+      ,消費税率
+      ,受入金額＿消費税
+      ,受入金額＿税込
+      ,営業担当者コード
+      ,営業担当者名
+      ,入力者従業員コード
+      ,入力者従業員名
+      ,出荷日
+      ,出荷ＮＯ
+      ,販売調整金
+      ,ＡＰ請求書番号
+      ,支払条件コード
+      ,支払条件名
+      ,ＰＯ発注ヘッダーＩＤ
+      ,ＰＯ発注明細ＩＤ
+      ,ＰＯ受入取引ＩＤ
+      ,作成プログラムＩＤ
+      ,作成日時
+      ,作成ユーザーＩＤ
+      ,最終更新プログラムＩＤ
+      ,最終更新日時
+      ,最終更新ユーザーＩＤ
+      ,一括訂正明細連番
+      ,ＮＩＰＳ仕入返品連番
+      ,基準単位コード
+      ,品目単位コード
+      ,発注明細摘要
+  FROM XXPO.XXPOT_仕入詳細
+  
+  
+...品目:130205:130205
+
+....マスタ:120918:151030
+個別管理品
+5118109183
+日新製鋼・ペンタイトＮ・コイル
+銘柄	01025011
+..コンカレント LOG出力:131101:131101
+	XXCMPZ10.proc_conc_log_put('proc_INS_受入取引ＩＦ START');
+	XXCMPZ10.proc_conc_log_put('ＰＯ発注明細ＩＤ :' || TO_CHAR(pi_wRec_受入取引明細.ＰＯ発注明細ＩＤ));
+	XXCMPZ10.proc_conc_log_put('消費税コード :' || pi_wRec_受入取引明細.消費税コード);
+
+..Perssonalize:151201:151201
+Select Distinct
+A.Id,
+A.Form_Name , A.Enabled, C.User_Form_Name, D.Application_Name ,A.Description,Ca.Action_Type,Ca.Enabled,Ca.Object_Type,
+ca.message_type,ca.message_text
+from FND_FORM_CUSTOM_RULES a,
+     FND_FORM b,
+     FND_FORM_TL c,
+     Fnd_Application_Tl D,
+     Fnd_Form_Custom_Actions ca
+where a.form_name = b.form_name
+And B.Form_Id = C.Form_Id
+And B.Application_Id = D.Application_Id
+--And D.Application_Id = 660 --For Order Management
+--And C.User_Form_Name Like 'Sales%'  --All the Forms that Start with Sales
+And A.Enabled ='Y'
+and a.id = ca.rule_id
+and c.language = 'JA'
+
+..EBS　LOG:170420:170420
+FND_LOG_MESSAGES
+
+Purge Debug Log and System Alerts
+fnd_log_admin.delete_by_date_i procedure
+
+
+..EBSその他:170502:170502
+--LOB size
+select sum(s.bytes)/1024/1024 "MB", count(1) "NumLobs"
+from dba_lobs l, dba_segments s
+where s.segment_name = l.segment_name
+and l.table_name = 'ASO_ORDER_FEEDBACK_T'
+
+
+--INSTALLED Module
+select app.product_code,
+tl.application_name,
+tl.LANGUAGE,
+decode(inst.status, 'I', 'Installed',
+'S', 'Shared',
+'N', 'Not Installed',
+'Wha-huh?') LicStatus,
+inst.patch_level
+from applsys.fnd_product_installations inst,
+applsys.fnd_application app,
+applsys.fnd_application_tl tl
+where app.application_id= inst.application_id
+and tl.application_id= app.application_id
+and app.product_code = 'OZF';
+
+.Python:151225:170615
+
+..pip:151225:170807
+set https_proxy=proxy.np-nippan.co.jp:8080
+
+pip install selenium --proxy=proxy.np-nippan.co.jp:8080
+
+python -m pip install cx_Oracle --pre
+
+--更新確認
+pip list --o
+  or
+pip-review 
+
+--更新
+pip install xx -U
+  or
+pip-review --auto
+
+..anaconda update:170601:170602
+set http_proxy=
+
+##本体のアップデート
+conda update conda
+
+##パッケージ一式のアップデート
+conda update --all
+
